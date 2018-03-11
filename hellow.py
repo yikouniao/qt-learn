@@ -9,7 +9,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication,QMainWindow
 
-from first2 import *
+from v101 import *
 
 if __name__ == '__main__':
     '''
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     '''
 
     app = QApplication(sys.argv)
-    mainWindow = Ui_Dialog()
+    mainWindow = Ui_MainWindow()
 
     mainWindow.show()
     sys.exit(app.exec_())
