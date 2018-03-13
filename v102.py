@@ -8,6 +8,7 @@
 
 import cv2
 import random
+from scipy import io
 
 from time import time
 from util import load_mot, iou, show_tracking_results
@@ -21,11 +22,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     '''GUI class for algorithms. '''
     # thread for multi object tracking algorithm.
     mot_thread = None
+    mcmot_thread = None
 
     # 初始化
     def __init__(self):
         super(Ui_MainWindow, self).__init__()  # 继承自Widgets的构造方法
         self.mot_thread = MOT()
+        self.mcmot_thread = MCMOT()
         self.setupUi(self)
 
     def setupUi(self, MainWindow):
@@ -215,17 +218,38 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frame_2_button)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
 
-        #梁总的选择文件按钮
-        self.choose_file = QtWidgets.QPushButton(self.frame_2_button)
+        #梁总的选择文本文件按钮1
+        self.choose_mat1 = QtWidgets.QPushButton(self.frame_2_button)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.choose_file.sizePolicy().hasHeightForWidth())
-        self.choose_file.setSizePolicy(sizePolicy)
-        self.choose_file.setMinimumSize(QtCore.QSize(0, 50))
-        self.choose_file.setMaximumSize(QtCore.QSize(300, 16777215))
-        self.choose_file.setObjectName("choose_file")
-        self.verticalLayout_4.addWidget(self.choose_file)
+        sizePolicy.setHeightForWidth(self.choose_mat1.sizePolicy().hasHeightForWidth())
+        self.choose_mat1.setSizePolicy(sizePolicy)
+        self.choose_mat1.setMinimumSize(QtCore.QSize(0, 50))
+        self.choose_mat1.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.choose_mat1.setObjectName("choose_mat1")
+        self.verticalLayout_4.addWidget(self.choose_mat1)
+
+        #梁总的选择文本文件按钮2
+        self.choose_mat2 = QtWidgets.QPushButton(self.frame_2_button)
+        self.choose_mat2.setMinimumSize(QtCore.QSize(0, 50))
+        self.choose_mat2.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.choose_mat2.setObjectName("choose_mat2")
+        self.verticalLayout_4.addWidget(self.choose_mat2)
+
+        #梁总的选择视频文件按钮1
+        self.choose_video1 = QtWidgets.QPushButton(self.frame_2_button)
+        self.choose_video1.setMinimumSize(QtCore.QSize(0, 50))
+        self.choose_video1.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.choose_video1.setObjectName("choose_video1")
+        self.verticalLayout_4.addWidget(self.choose_video1)
+
+        #梁总的选择视频文件按钮2
+        self.choose_video2 = QtWidgets.QPushButton(self.frame_2_button)
+        self.choose_video2.setMinimumSize(QtCore.QSize(0, 50))
+        self.choose_video2.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.choose_video2.setObjectName("choose_video2")
+        self.verticalLayout_4.addWidget(self.choose_video2)
 
         #梁总的开始按钮
         self.begin_2 = QtWidgets.QPushButton(self.frame_2_button)
@@ -295,9 +319,15 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
 
         #梁总的选择文件
-        self.choose_file.clicked.connect(self.Open_file2)
+        self.choose_mat1.clicked.connect(self.Open_file_mat1)
+        self.choose_mat2.clicked.connect(self.Open_file_mat2)
+        self.choose_video1.clicked.connect(self.Open_file_video1)
+        self.choose_video2.clicked.connect(self.Open_file_video2)
         #梁总的运行
-        self.begin_2.clicked.connect(self.Begin_2)
+        self.begin_2.clicked.connect(self.mcmot_thread.start)
+        # get the current frame and display the image on the gui.
+        self.mcmot_thread.mcmot_signal1.connect(self.update_mcmot_frame1)
+        self.mcmot_thread.mcmot_signal2.connect(self.update_mcmot_frame2)
 
 
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -309,9 +339,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.choose_video.setText(_translate("MainWindow", "选择视频文件"))
         self.begin_1.setText(_translate("MainWindow", "运行"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_1), _translate("MainWindow", "单摄像头多目标跟踪"))
-        self.choose_file.setText(_translate("MainWindow", "选择文件"))
+        self.choose_mat1.setText(_translate("MainWindow", "选择文本文件1"))
+        self.choose_mat2.setText(_translate("MainWindow", "选择文本文件2"))
+        self.choose_video1.setText(_translate("MainWindow", "选择视频文件1"))
+        self.choose_video2.setText(_translate("MainWindow", "选择视频文件2"))
         self.begin_2.setText(_translate("MainWindow", "运行"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "algorithm 2"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "多摄像头多目标跟踪"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "algorithm 3"))
         self.menu_about.setTitle(_translate("MainWindow", "关于"))
     #任老师的开txt文件槽函数
@@ -330,17 +363,27 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                                                                  "C:/",
                                                                                  "All Files (*);;Video Files (*.rmvb,*.avi)")
 
-    #梁总，你看着改这个是开文件
-    def Open_file2(self):
-        '''set the multi-object tracking detection directory. '''
-        self.mot_thread.mot_det_dir, _ = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                                               "选取文本文件",
-                                                                               "C:/",
-                                                                               "All Files (*);;Text Files (*.txt)")
-
-    #梁总，你的运行
-    def Begin_2(self):
-        return
+    #梁总开文本和视频文件1和2
+    def Open_file_mat1(self):
+        self.mcmot_thread.mcmot_det_dir1, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                                    "选取文本文件",
+                                                                                    "C:/",
+                                                                                    "All Files (*);;Text Files (*.mat)")
+    def Open_file_mat2(self):
+        self.mcmot_thread.mcmot_det_dir2, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                                    "选取文本文件",
+                                                                                    "C:/",
+                                                                                    "All Files (*);;Text Files (*.mat)")
+    def Open_file_video1(self):
+        self.mcmot_thread.mcmot_video_dir1, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                                      "选取文本文件",
+                                                                                      "C:/",
+                                                                                      "All Files (*);;Text Files (*.mp4)")
+    def Open_file_video2(self):
+        self.mcmot_thread.mcmot_video_dir2, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                                      "选取文本文件",
+                                                                                      "C:/",
+                                                                                      "All Files (*);;Text Files (*.mp4)")
 
     #用来显示关于的
     def show_about(self):
@@ -348,8 +391,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                 "关于",
                                 "上海交通大学CVPR实验室")
     def update_frame(self, rgb_frame):
-        self.label_image.clear()
-        self.label_image.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
+        self.label_image_1.clear()
+        self.label_image_1.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
+    def update_mcmot_frame1(self, rgb_frame):
+        self.label_2_1.clear()
+        self.label_2_1.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
+    def update_mcmot_frame2(self, rgb_frame):
+        self.label_2_2.clear()
+        self.label_2_2.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
 
 
 class MOT(QtCore.QThread):
@@ -420,6 +469,61 @@ class MOT(QtCore.QThread):
             self.mot_signal.emit(rgb_frame)
         self.vc.release()
 
+class MCMOT(QtCore.QThread):
+    '''A class for multi object tracking thread. '''
+    # video path and detection text path.
+    mcmot_det_dir1 = None
+    mcmot_video_dir1 = None
+    vc1 = None
+    mcmot_det_dir2 = None
+    mcmot_video_dir2 = None
+    vc2 = None
+
+    mcmot_signal1 = QtCore.pyqtSignal(QtGui.QImage)
+    mcmot_signal2 = QtCore.pyqtSignal(QtGui.QImage)
+
+    def __init__(self, parent=None):
+        super(MCMOT, self).__init__(parent)
+
+    def run(self):
+        self.vc1 = cv2.VideoCapture(self.mcmot_video_dir1)
+        self.vc2 = cv2.VideoCapture(self.mcmot_video_dir2)
+
+        # load bounding boxes.
+        dets1 = io.loadmat(self.mcmot_det_dir1)['demoData1']
+        dets2 = io.loadmat(self.mcmot_det_dir2)['demoData2']
+
+        # set the color of the object randomly.
+        color_for_boundingbox = [(13 * i % 255, (255 - 5 * i) % 255, (240 + 10 * i) % 255) for i in range(0, 51)]
+
+        # run algorithm.
+        f_num = 0
+        while(True):
+            retval, current_frame1 = self.vc1.read()
+            if retval is False:
+                break
+            retval, current_frame2 = self.vc2.read()
+            if retval is False:
+                break
+            #labeled_frame = show_tracking_results(current_frame, self.tracks_active)
+            f_num = f_num + 1
+            f_num1 = f_num + 76713
+            dets1_f = dets1[dets1[:, 2] == f_num1, :]
+            for det in dets1_f:
+                cv2.rectangle(
+                    current_frame1, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_for_boundingbox[(det[1] * 5)%50], 2)
+            rgb_frame1 = convert_cvimage_to_qimage(current_frame1)
+            self.mcmot_signal1.emit(rgb_frame1)
+
+            f_num2 = f_num + 76713
+            dets2_f = dets2[dets2[:, 2] == f_num2, :]
+            for det in dets2_f:
+                cv2.rectangle(
+                    current_frame2, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_for_boundingbox[(det[1] * 5)%50], 2)
+            rgb_frame2 = convert_cvimage_to_qimage(current_frame2)
+            self.mcmot_signal2.emit(rgb_frame2)
+        self.vc1.release()
+        self.vc2.release()
 
 def convert_cvimage_to_qimage(cvimage):
     '''Change the image format from mat to QImage.
