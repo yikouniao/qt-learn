@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'v102.ui'
+# Form implementation generated from reading ui file 'v103.ui'
 #
 # Created by: PyQt5 UI code generator 5.6
 #
@@ -17,7 +17,6 @@ from PyQt5.QtCore import QObject,pyqtSignal
 '''import qrc_resource'''
 from functools import partial
 
-#主窗口
 class Ui_MainWindow(QtWidgets.QMainWindow):
     '''GUI class for algorithms. '''
     # thread for multi object tracking algorithm.
@@ -33,11 +32,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        #固定窗口大小
+        #窗口大小
         MainWindow.resize(1280, 720)
         MainWindow.setMinimumSize(QtCore.QSize(1280, 720))
         MainWindow.setMaximumSize(QtCore.QSize(1280, 720))
-        # 交大校徽
+
+        #校徽
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("./res/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         # 这个是主窗口的图标
@@ -45,14 +45,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         MainWindow.setAutoFillBackground(False)
         MainWindow.setStyleSheet("")
         MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
-
-        #主页面，及布局
+        #主页面，布局
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout_3.setObjectName("gridLayout_3")
 
-        #切换页面的widget
+        #切换页面
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
         self.tab_1 = QtWidgets.QWidget()
@@ -60,38 +59,51 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.tab_1)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
+        self.frame = QtWidgets.QFrame(self.tab_1)
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame.setObjectName("frame")
+        self.gridLayout_4 = QtWidgets.QGridLayout(self.frame)
+        self.gridLayout_4.setObjectName("gridLayout_4")
+        self.label_image_1 = QtWidgets.QLabel(self.frame)
 
-        self.label_image_1 = QtWidgets.QLabel(self.tab_1)
-        # set the window size for video/image
-        self.label_image_1.setFixedSize(640, 480)
+        #图像大小
+        self.label_image_1.setMinimumSize(QtCore.QSize(640, 0))
+        self.label_image_1.setMaximumSize(QtCore.QSize(640, 16777215))
         self.label_image_1.setText("")
         self.label_image_1.setObjectName("label_image_1")
-        self.verticalLayout.addWidget(self.label_image_1)
-        #tab1 的frame
+        self.gridLayout_4.addWidget(self.label_image_1, 0, 0, 1, 1)
+        self.label_image_1.raise_()
+        self.label_image_1.raise_()
+        #tab的frame
+        self.verticalLayout.addWidget(self.frame)
         self.frame_1_out = QtWidgets.QFrame(self.tab_1)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.frame_1_out.sizePolicy().hasHeightForWidth())
+
+
         self.frame_1_out.setSizePolicy(sizePolicy)
-        self.frame_1_out.setMaximumSize(QtCore.QSize(1230, 230))
+        self.frame_1_out.setMaximumSize(QtCore.QSize(1230, 200))
         self.frame_1_out.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_1_out.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_1_out.setObjectName("frame_1_out")
 
-
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout(self.frame_1_out)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
 
-        #放button的frame
+        #第一个页面的按钮frame
         self.frame_1_button = QtWidgets.QFrame(self.frame_1_out)
         self.frame_1_button.setMinimumSize(QtCore.QSize(30, 0))
         self.frame_1_button.setMaximumSize(QtCore.QSize(350, 16777215))
         self.frame_1_button.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_1_button.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_1_button.setObjectName("frame_1_button")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.frame_1_button)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
+
+        #布局
+        self.gridLayout = QtWidgets.QGridLayout(self.frame_1_button)
+        self.gridLayout.setObjectName("gridLayout")
 
         #选择文本文件按钮
         self.Choose_txt = QtWidgets.QPushButton(self.frame_1_button)
@@ -100,27 +112,30 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.Choose_txt.sizePolicy().hasHeightForWidth())
         self.Choose_txt.setSizePolicy(sizePolicy)
-        self.Choose_txt.setMinimumSize(QtCore.QSize(0, 50))
-        self.Choose_txt.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.Choose_txt.setMinimumSize(QtCore.QSize(0, 40))
+        self.Choose_txt.setMaximumSize(QtCore.QSize(200, 50))
         self.Choose_txt.setObjectName("Choose_txt")
-        self.verticalLayout_2.addWidget(self.Choose_txt)
-
+        self.gridLayout.addWidget(self.Choose_txt, 0, 0, 1, 1)
         #选择视频文件按钮
         self.choose_video = QtWidgets.QPushButton(self.frame_1_button)
-        self.choose_video.setMinimumSize(QtCore.QSize(0, 50))
-        self.choose_video.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.choose_video.setMinimumSize(QtCore.QSize(0, 40))
+        self.choose_video.setMaximumSize(QtCore.QSize(200, 50))
         self.choose_video.setObjectName("choose_video")
-        self.verticalLayout_2.addWidget(self.choose_video)
-
+        self.gridLayout.addWidget(self.choose_video, 1, 0, 1, 1)
         #任老师的开始按钮
         self.begin_1 = QtWidgets.QPushButton(self.frame_1_button)
-        self.begin_1.setMinimumSize(QtCore.QSize(50, 50))
-        self.begin_1.setMaximumSize(QtCore.QSize(300, 50))
+        self.begin_1.setMinimumSize(QtCore.QSize(50, 40))
+        self.begin_1.setMaximumSize(QtCore.QSize(200, 50))
         self.begin_1.setObjectName("begin_1")
-        self.verticalLayout_2.addWidget(self.begin_1)
+        self.gridLayout.addWidget(self.begin_1, 2, 0, 1, 1)
+        #任老师的结束视频按钮
+        self.end_video = QtWidgets.QPushButton(self.frame_1_button)
+        self.end_video.setMinimumSize(QtCore.QSize(50, 40))
+        self.end_video.setMaximumSize(QtCore.QSize(200, 50))
+        self.end_video.setObjectName("end_video")
+        self.gridLayout.addWidget(self.end_video, 3, 0, 1, 1)
         self.horizontalLayout_2.addWidget(self.frame_1_button)
-
-        #交大校徽
+        #校徽
         self.label_jiaoda = QtWidgets.QLabel(self.frame_1_out)
         self.label_jiaoda.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -139,62 +154,52 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_jiaoda.setIndent(-1)
         self.label_jiaoda.setOpenExternalLinks(False)
         self.label_jiaoda.setObjectName("label_jiaoda")
-
-
         self.horizontalLayout_2.addWidget(self.label_jiaoda)
         self.verticalLayout.addWidget(self.frame_1_out)
         self.tabWidget.addTab(self.tab_1, "")
+
+        #第二个页面
         self.tab_2 = QtWidgets.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.tab_2)
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
-
-        #第二个页面的上面的frame
         self.frame_2_up = QtWidgets.QFrame(self.tab_2)
         self.frame_2_up.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_2_up.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_2_up.setObjectName("frame_2_up")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.frame_2_up)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        #第二个页面的第一幅图像
+        #第二个页面的第一个图
         self.label_2_1 = QtWidgets.QLabel(self.frame_2_up)
-        # set the window size for video/image
-        self.label_2_1.setFixedSize(640, 480)
         self.label_2_1.setMinimumSize(QtCore.QSize(600, 0))
         self.label_2_1.setMaximumSize(QtCore.QSize(600, 16777215))
         self.label_2_1.setText("")
         self.label_2_1.setObjectName("label_2_1")
         self.horizontalLayout.addWidget(self.label_2_1)
-
-        #第二个页面的第二副图像
+        #第二个页面第二个图
         self.label_2_2 = QtWidgets.QLabel(self.frame_2_up)
-        # set the window size for video/image
-        self.label_2_2.setFixedSize(640, 480)
         self.label_2_2.setMinimumSize(QtCore.QSize(600, 0))
         self.label_2_2.setMaximumSize(QtCore.QSize(600, 16777215))
         self.label_2_2.setText("")
         self.label_2_2.setObjectName("label_2_2")
-
-
         self.horizontalLayout.addWidget(self.label_2_2)
         self.verticalLayout_3.addWidget(self.frame_2_up)
-        #第二个页面，下面的frame
+        #第二个页面下面的frame
         self.frame_2_down = QtWidgets.QFrame(self.tab_2)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.frame_2_down.sizePolicy().hasHeightForWidth())
         self.frame_2_down.setSizePolicy(sizePolicy)
+        self.frame_2_down.setMinimumSize(QtCore.QSize(0, 200))
+        self.frame_2_down.setMaximumSize(QtCore.QSize(16777215, 200))
         self.frame_2_down.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_2_down.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_2_down.setObjectName("frame_2_down")
-
-
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.frame_2_down)
         self.verticalLayout_6.setObjectName("verticalLayout_6")
-
-        #第二个页面下面frame的主fame
+        #第二个页面下面的主frame
         self.frame_2_down_main = QtWidgets.QFrame(self.frame_2_down)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -207,7 +212,6 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.frame_2_down_main.setObjectName("frame_2_down_main")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.frame_2_down_main)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-
         #第二个页面的buttonframe
         self.frame_2_button = QtWidgets.QFrame(self.frame_2_down_main)
         self.frame_2_button.setMinimumSize(QtCore.QSize(30, 0))
@@ -215,50 +219,59 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.frame_2_button.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_2_button.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_2_button.setObjectName("frame_2_button")
-        self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.frame_2_button)
-        self.verticalLayout_4.setObjectName("verticalLayout_4")
-
-        #梁总的选择文本文件按钮1
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.frame_2_button)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        #选择文本文件1
         self.choose_mat1 = QtWidgets.QPushButton(self.frame_2_button)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.choose_mat1.sizePolicy().hasHeightForWidth())
         self.choose_mat1.setSizePolicy(sizePolicy)
-        self.choose_mat1.setMinimumSize(QtCore.QSize(0, 50))
-        self.choose_mat1.setMaximumSize(QtCore.QSize(300, 16777215))
+        self.choose_mat1.setMinimumSize(QtCore.QSize(0, 35))
+        self.choose_mat1.setMaximumSize(QtCore.QSize(150, 40))
         self.choose_mat1.setObjectName("choose_mat1")
-        self.verticalLayout_4.addWidget(self.choose_mat1)
-
-        #梁总的选择文本文件按钮2
+        self.gridLayout_2.addWidget(self.choose_mat1, 0, 0, 1, 1)
+        #选择文本文件2
         self.choose_mat2 = QtWidgets.QPushButton(self.frame_2_button)
-        self.choose_mat2.setMinimumSize(QtCore.QSize(0, 50))
-        self.choose_mat2.setMaximumSize(QtCore.QSize(300, 16777215))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.choose_mat2.sizePolicy().hasHeightForWidth())
+        self.choose_mat2.setSizePolicy(sizePolicy)
+        self.choose_mat2.setMinimumSize(QtCore.QSize(0, 35))
+        self.choose_mat2.setMaximumSize(QtCore.QSize(150, 30))
         self.choose_mat2.setObjectName("choose_mat2")
-        self.verticalLayout_4.addWidget(self.choose_mat2)
-
-        #梁总的选择视频文件按钮1
+        self.gridLayout_2.addWidget(self.choose_mat2, 1, 0, 1, 1)
+        #选择视频文件1
         self.choose_video1 = QtWidgets.QPushButton(self.frame_2_button)
-        self.choose_video1.setMinimumSize(QtCore.QSize(0, 50))
-        self.choose_video1.setMaximumSize(QtCore.QSize(300, 16777215))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.choose_video1.sizePolicy().hasHeightForWidth())
+        self.choose_video1.setSizePolicy(sizePolicy)
+        self.choose_video1.setMinimumSize(QtCore.QSize(0, 35))
+        self.choose_video1.setMaximumSize(QtCore.QSize(150, 30))
         self.choose_video1.setObjectName("choose_video1")
-        self.verticalLayout_4.addWidget(self.choose_video1)
-
-        #梁总的选择视频文件按钮2
+        self.gridLayout_2.addWidget(self.choose_video1, 2, 0, 1, 1)
+        #选择视频文件2
         self.choose_video2 = QtWidgets.QPushButton(self.frame_2_button)
-        self.choose_video2.setMinimumSize(QtCore.QSize(0, 50))
-        self.choose_video2.setMaximumSize(QtCore.QSize(300, 16777215))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.choose_video2.sizePolicy().hasHeightForWidth())
+        self.choose_video2.setSizePolicy(sizePolicy)
+        self.choose_video2.setMinimumSize(QtCore.QSize(0, 35))
+        self.choose_video2.setMaximumSize(QtCore.QSize(150, 40))
         self.choose_video2.setObjectName("choose_video2")
-        self.verticalLayout_4.addWidget(self.choose_video2)
-
-        #梁总的开始按钮
+        self.gridLayout_2.addWidget(self.choose_video2, 3, 0, 1, 1)
+        #梁总的开始
         self.begin_2 = QtWidgets.QPushButton(self.frame_2_button)
-        self.begin_2.setMinimumSize(QtCore.QSize(50, 50))
-        self.begin_2.setMaximumSize(QtCore.QSize(300, 50))
+        self.begin_2.setMinimumSize(QtCore.QSize(50, 30))
+        self.begin_2.setMaximumSize(QtCore.QSize(150, 30))
         self.begin_2.setObjectName("begin_2")
-        self.verticalLayout_4.addWidget(self.begin_2)
+        self.gridLayout_2.addWidget(self.begin_2, 4, 0, 1, 1)
         self.horizontalLayout_3.addWidget(self.frame_2_button)
-        #交大校徽
         self.label_jiaoda_2 = QtWidgets.QLabel(self.frame_2_down_main)
         self.label_jiaoda_2.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -280,56 +293,47 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.horizontalLayout_3.addWidget(self.label_jiaoda_2)
         self.verticalLayout_6.addWidget(self.frame_2_down_main)
         self.verticalLayout_3.addWidget(self.frame_2_down)
-        self.tabWidget.addTab(self.tab_2, "")
 
-        #第三个界面，尚无
-        self.tab_3 = QtWidgets.QWidget()
-        self.tab_3.setObjectName("tab_3")
-        self.tabWidget.addTab(self.tab_3, "")
-        self.verticalLayout_5.addWidget(self.tabWidget)
+
+        self.tabWidget.addTab(self.tab_2, "")
+        self.gridLayout_3.addWidget(self.tabWidget, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
 
-        #主菜单
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1280, 26))
         self.menubar.setObjectName("menubar")
-        #关于按钮
-        self.menu_about = QtWidgets.QMenu(self.menubar)
-        self.menu_about.setObjectName("menu_about")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
-        self.menubar.addAction(self.menu_about.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
-        #连接信号槽
-        #关于
-        self.menubar.triggered['QAction*'].connect(self.show_about)
-        #选择文本文件
-        self.Choose_txt.clicked.connect(self.Open_file_txt)
-        #选择视频文件
-        self.choose_video.clicked.connect(self.Open_file_video)
-        #任老师的运行
+        self.tabWidget.setCurrentIndex(0)
+        #信号槽连接
+        #任老师的开始
         # start the multi object tracking thread, run the algorithm.
         self.begin_1.clicked.connect(self.mot_thread.start)
         # get the current frame and display the image on the gui.
         self.mot_thread.mot_signal.connect(self.update_frame)
-
-
-        #梁总的选择文件
-        self.choose_mat1.clicked.connect(self.Open_file_mat1)
-        self.choose_mat2.clicked.connect(self.Open_file_mat2)
-        self.choose_video1.clicked.connect(self.Open_file_video1)
-        self.choose_video2.clicked.connect(self.Open_file_video2)
-        #梁总的运行
+        #任老师的选择视频
+        self.choose_video.clicked.connect(MainWindow.Open_file_video)
+        #梁总的开始
         self.begin_2.clicked.connect(self.mcmot_thread.start)
         # get the current frame and display the image on the gui.
         self.mcmot_thread.mcmot_signal1.connect(self.update_mcmot_frame1)
         self.mcmot_thread.mcmot_signal2.connect(self.update_mcmot_frame2)
-
-
+        #任老师的选择文本文件
+        self.Choose_txt.clicked.connect(MainWindow.Open_file_txt)
+        #任老师的停止,,,自己改吧
+        self.end_video.clicked.connect(self.End)
+        #梁总的选择文本文件1
+        self.choose_mat1.clicked.connect(MainWindow.Open_file_mat1)
+        #梁总的选择文件2
+        self.choose_mat2.clicked.connect(MainWindow.Open_file_mat2)
+        #梁总的选择视频文件1
+        self.choose_video1.clicked.connect(MainWindow.Open_file_video1)
+        #梁总的选择视频文件2
+        self.choose_video2.clicked.connect(MainWindow.Open_file_video2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -338,6 +342,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.Choose_txt.setText(_translate("MainWindow", "选择文本文件"))
         self.choose_video.setText(_translate("MainWindow", "选择视频文件"))
         self.begin_1.setText(_translate("MainWindow", "运行"))
+        self.end_video.setText(_translate("MainWindow", "停止"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_1), _translate("MainWindow", "单摄像头多目标跟踪"))
         self.choose_mat1.setText(_translate("MainWindow", "选择文本文件1"))
         self.choose_mat2.setText(_translate("MainWindow", "选择文本文件2"))
@@ -345,9 +350,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.choose_video2.setText(_translate("MainWindow", "选择视频文件2"))
         self.begin_2.setText(_translate("MainWindow", "运行"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "多摄像头多目标跟踪"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "algorithm 3"))
-        self.menu_about.setTitle(_translate("MainWindow", "关于"))
-    #任老师的开txt文件槽函数
+
     def Open_file_txt(self):
         '''set the multi-object tracking detection directory. '''
         self.mot_thread.mot_det_dir, _ = QtWidgets.QFileDialog.getOpenFileName(self,
@@ -385,11 +388,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                                                                       "C:/",
                                                                                       "All Files (*);;Text Files (*.mp4)")
 
-    #用来显示关于的
-    def show_about(self):
-        QtWidgets.QMessageBox.information(self,
-                                "关于",
-                                "上海交通大学CVPR实验室")
+
+
     def update_frame(self, rgb_frame):
         self.label_image_1.clear()
         self.label_image_1.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
@@ -399,8 +399,8 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def update_mcmot_frame2(self, rgb_frame):
         self.label_2_2.clear()
         self.label_2_2.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
-
-
+    def End(self):
+        return
 class MOT(QtCore.QThread):
     '''A class for multi object tracking thread. '''
     # video path and detection text path.
