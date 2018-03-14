@@ -348,7 +348,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.choose_mat2.setText(_translate("MainWindow", "选择文本文件2"))
         self.choose_video1.setText(_translate("MainWindow", "选择视频文件1"))
         self.choose_video2.setText(_translate("MainWindow", "选择视频文件2"))
-        self.begin_2.setText(_translate("MainWindow", "运行"))
+        self.begin_2.setText(_translate("MainWindow", "运行并导出结果"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "多摄像头多目标跟踪"))
 
     def Open_file_txt(self):
@@ -500,12 +500,11 @@ class MCMOT(QtCore.QThread):
         f_num = 0
         while(True):
             retval, current_frame1 = self.vc1.read()
-            if retval is False:
+            if retval == False:
                 break
             retval, current_frame2 = self.vc2.read()
-            if retval is False:
+            if retval == False:
                 break
-            #labeled_frame = show_tracking_results(current_frame, self.tracks_active)
             f_num = f_num + 1
             f_num1 = f_num + 76713
             dets1_f = dets1[dets1[:, 2] == f_num1, :]
@@ -524,6 +523,13 @@ class MCMOT(QtCore.QThread):
             self.mcmot_signal2.emit(rgb_frame2)
         self.vc1.release()
         self.vc2.release()
+        with open('MCMOT_Results.txt', 'w') as rst_f:
+            for d in dets1:
+                if d[2] > 76713 and d[2] < 115069:
+                    rst_f.write(','.join([str(value) for value in d]) + '\n')
+            for d in dets2:
+                if d[2] > 76713 and d[2] < 115069:
+                    rst_f.write(','.join([str(value) for value in d]) + '\n')
 
 def convert_cvimage_to_qimage(cvimage):
     '''Change the image format from mat to QImage.
