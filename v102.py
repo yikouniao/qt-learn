@@ -18,6 +18,7 @@ from PyQt5.QtCore import QObject,pyqtSignal
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMessageBox
 from functools import partial
+from about import *
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     '''GUI class for algorithms. '''
@@ -34,6 +35,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #self.setFixedSize(self.sizeHint())
         image = QtGui.QImage()
         image.load('./res/icon.png')
+
 
         self.label_image_1.setImage(image)
 
@@ -108,11 +110,18 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_image_3.setImage(rgb_frame)
         #self.label_image_3.clear()
         #self.label_image_3.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
+
+
     def show_about(self):
-        reply = QMessageBox.information(self,
-                                        "关于",
-                                        "上海交通大学模式识别与智能系统研究组",
-                                        QMessageBox.Ok )
+
+        QMessageBox.about(self,"关于", "<html><head/><body><p align=\"center\">"
+                                                "<img src=\"./res/icon.png\"/></p><p align=\"center\"><span style=\" font-size:10pt;\">"
+                                                "上海交通大学模式识别与人工智能研究组</span></p><p align=\"center\"><span style=\" font-size:10pt;\">"
+                                                "2018.3.15</span></p></body></html>")
+
+
+
+
 
         
 class MOT(QtCore.QThread):

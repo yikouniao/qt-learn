@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QApplication,QMainWindow
 
 from v102 import *
 
+
 if __name__ == '__main__':
     '''
     主函数
@@ -18,6 +19,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
     mainWindow = Ui_MainWindow()
+
 
     mainWindow.show()
     sys.exit(app.exec_())
