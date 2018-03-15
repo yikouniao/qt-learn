@@ -16,6 +16,7 @@ from util import load_mot, iou, show_tracking_results
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QObject,pyqtSignal
 from PyQt5.uic import loadUi
+from PyQt5.QtWidgets import QMessageBox
 from functools import partial
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -31,15 +32,16 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.mcmot_thread = MCMOT()
         loadUi('v104.ui',self,'resource.qrc')
         #self.setFixedSize(self.sizeHint())
+        image = QtGui.QImage()
+        image.load('./res/icon.png')
+
+        self.label_image_1.setImage(image)
 
         #icon = QtGui.QIcon()
        #icon.addPixmap(QtGui.QPixmap("./res/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         # 这个是主窗口的图标
         self.setWindowIcon(QtGui.QIcon("./res/main.ico"))
-        # 第一个校徽
-        self.label_jiaoda.setPixmap(QtGui.QPixmap("./res/icon.png"))
-        # 第二个校徽
-        self.label_jiaoda_2.setPixmap(QtGui.QPixmap("./res/icon.png"))
+
 
         # start the multi object tracking thread, run the algorithm.
         self.begin_1.clicked.connect(self.mot_thread.start)
@@ -51,10 +53,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.mcmot_thread.mcmot_signal1.connect(self.update_mcmot_frame1)
         self.mcmot_thread.mcmot_signal2.connect(self.update_mcmot_frame2)
 
-        #结束视频的按钮及槽函数
-        #self.end_video.clicked.connect(自己加吧)
-        #输出的按钮及槽函数
-        #self.Output.clicked.connect(自己加吧)
+        #任老师的结束
+        #self.End_1.clicked.connect(自己加吧)
+        #梁总的结束
+        #self.End_2.clicked.connect(自己加吧)
     def Open_file_txt(self):
         '''set the multi-object tracking detection directory. '''
         self.mot_thread.mot_det_dir, _ = QtWidgets.QFileDialog.getOpenFileName(self,
@@ -103,8 +105,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     def update_mcmot_frame2(self, rgb_frame):
         self.label_2_2.clear()
         self.label_2_2.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
-    def End(self):
-        return
+    def show_about(self):
+        reply = QMessageBox.information(self,
+                                        "关于",
+                                        "上海交通大学模式识别与智能系统研究组",
+                                        QMessageBox.Ok )
+
         
 class MOT(QtCore.QThread):
     '''A class for multi object tracking thread. '''
