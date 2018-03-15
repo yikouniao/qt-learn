@@ -54,9 +54,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.mcmot_thread.mcmot_signal2.connect(self.update_mcmot_frame2)
 
         #任老师的结束
-        #self.End_1.clicked.connect(自己加吧)
+        self.End_1.clicked.connect(self.mot_thread.terminate)
         #梁总的结束
-        #self.End_2.clicked.connect(自己加吧)
+        self.End_2.clicked.connect(self.mcmot_thread.terminate)
+
     def Open_file_txt(self):
         '''set the multi-object tracking detection directory. '''
         self.mot_thread.mot_det_dir, _ = QtWidgets.QFileDialog.getOpenFileName(self,
@@ -100,11 +101,13 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_image_1.clear()
         self.label_image_1.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
     def update_mcmot_frame1(self, rgb_frame):
-        self.label_2_1.clear()
-        self.label_2_1.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
+        self.label_image_2.setImage(rgb_frame)
+        #self.label_image_2.clear()
+        #self.label_image_2.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
     def update_mcmot_frame2(self, rgb_frame):
-        self.label_2_2.clear()
-        self.label_2_2.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
+        self.label_image_3.setImage(rgb_frame)
+        #self.label_image_3.clear()
+        #self.label_image_3.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
     def show_about(self):
         reply = QMessageBox.information(self,
                                         "关于",
@@ -197,11 +200,13 @@ class MCMOT(QtCore.QThread):
         super(MCMOT, self).__init__(parent)
 
     def run(self):
-        if self.mcmot_video_dir1.split('/')[-1] != '1.mp4' or self.mcmot_video_dir2.split('/')[-1] != '2.mp4':
-            print('Unmatched Video Files And Detection Files!\n')
-            return
+        print(self.mcmot_video_dir1)
+        print(self.mcmot_video_dir2)
         if self.mcmot_det_dir1.split('/')[-1] != 'demoData1.mat' or self.mcmot_det_dir2.split('/')[-1] != 'demoData2.mat':
             print('UUnmatched Video Files And Detection Files!\n')
+            return
+        if self.mcmot_video_dir1.split('/')[-1] != '1.mp4' or self.mcmot_video_dir2.split('/')[-1] != '2.mp4':
+            print('Unmatched Video Files And Detection Files!\n')
             return
 
         # load videos.
