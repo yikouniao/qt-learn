@@ -14,7 +14,7 @@ from time import time
 from util import load_mot, iou, show_tracking_results
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QObject,pyqtSignal
-'''import qrc_resource'''
+from PyQt5.uic import loadUi
 from functools import partial
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
@@ -28,9 +28,227 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         super(Ui_MainWindow, self).__init__()  # 继承自Widgets的构造方法
         self.mot_thread = MOT()
         self.mcmot_thread = MCMOT()
-        self.setupUi(self)
+        loadUi('v104.ui',self,'resource.qrc')
+        #self.setFixedSize(self.sizeHint())
 
-    def setupUi(self, MainWindow):
+        #icon = QtGui.QIcon()
+       #icon.addPixmap(QtGui.QPixmap("./res/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        # 这个是主窗口的图标
+        self.setWindowIcon(QtGui.QIcon("./res/main.ico"))
+        # 第一个校徽
+        self.label_jiaoda.setPixmap(QtGui.QPixmap("./res/icon.png"))
+        # 第二个校徽
+        self.label_jiaoda_2.setPixmap(QtGui.QPixmap("./res/icon.png"))
+
+        # start the multi object tracking thread, run the algorithm.
+        self.begin_1.clicked.connect(self.mot_thread.start)
+        # get the current frame and display the image on the gui.
+        self.mot_thread.mot_signal.connect(self.update_frame)
+
+        self.begin_2.clicked.connect(self.mcmot_thread.start)
+        # get the current frame and display the image on the gui.
+        self.mcmot_thread.mcmot_signal1.connect(self.update_mcmot_frame1)
+        self.mcmot_thread.mcmot_signal2.connect(self.update_mcmot_frame2)
+
+        #结束视频的按钮及槽函数
+        #self.end_video.clicked.connect(自己加吧)
+        #输出的按钮及槽函数
+        #self.Output.clicked.connect(自己加吧)
+    def Open_file_txt(self):
+        '''set the multi-object tracking detection directory. '''
+        self.mot_thread.mot_det_dir, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                               "选取文本文件",
+                                                                               "C:/",
+                                                                               "All Files (*);;Text Files (*.txt)")
+
+    # 开视频文件槽函数
+    def Open_file_video(self):
+        '''set the multi-object tracking video directory.'''
+        self.mot_thread.mot_video_dir, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                                 "选取视频文件",
+                                                                                 "C:/",
+                                                                                 "All Files (*);;Video Files (*.rmvb,*.avi)")
+
+    #梁总开文本和视频文件1和2
+    def Open_file_mat1(self):
+        self.mcmot_thread.mcmot_det_dir1, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                                    "选取文本文件",
+                                                                                    "C:/",
+                                                                                    "All Files (*);;Text Files (*.mat)")
+    def Open_file_mat2(self):
+        self.mcmot_thread.mcmot_det_dir2, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                                    "选取文本文件",
+                                                                                    "C:/",
+                                                                                    "All Files (*);;Text Files (*.mat)")
+    def Open_file_video1(self):
+        self.mcmot_thread.mcmot_video_dir1, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                                      "选取文本文件",
+                                                                                      "C:/",
+                                                                                      "All Files (*);;Text Files (*.mp4)")
+    def Open_file_video2(self):
+        self.mcmot_thread.mcmot_video_dir2, _ = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                                                      "选取文本文件",
+                                                                                      "C:/",
+                                                                                      "All Files (*);;Text Files (*.mp4)")
+
+
+
+    def update_frame(self, rgb_frame):
+        self.label_image_1.clear()
+        self.label_image_1.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
+    def update_mcmot_frame1(self, rgb_frame):
+        self.label_2_1.clear()
+        self.label_2_1.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
+    def update_mcmot_frame2(self, rgb_frame):
+        self.label_2_2.clear()
+        self.label_2_2.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
+    def End(self):
+        return
+class MOT(QtCore.QThread):
+    '''A class for multi object tracking thread. '''
+    # video path and detection text path.
+    mot_det_dir = None
+    mot_video_dir = None
+    vc = None
+    tracks_active = []
+
+    mot_signal = QtCore.pyqtSignal(QtGui.QImage)
+
+    def __init__(self, parent=None):
+        super(MOT, self).__init__(parent)
+
+    def run(self):
+        self.vc = cv2.VideoCapture(self.mot_video_dir)
+
+        sigma_l = 0.4
+        sigma_h = 0.5
+        sigma_iou = 0.2
+        t_min = 2
+
+        # load bounding boxes.
+        detections = load_mot(self.mot_det_dir)
+
+        tracks_finished = []
+
+        # set the color of the object randomly.
+        color_for_boundingbox = [(13 * i % 255, (255 - 5 * i) % 255, (240 + 10 * i) % 255) for i in range(0, 51)]
+
+        # run algorithm.
+        for frame_num, detections_frame in enumerate(detections, start=1):
+            # apply low threshold to detections
+
+            dets = [det for det in detections_frame if det['score'] >= sigma_l]
+
+            updated_tracks = []
+
+            for track in self.tracks_active:
+                if len(dets) > 0:
+                    # get det with highest iou
+                    best_match = max(dets, key=lambda x: iou(track['bboxes'][-1], x['bbox']))
+                    if iou(track['bboxes'][-1], best_match['bbox']) >= sigma_iou:
+                        track['bboxes'].append(best_match['bbox'])
+                        track['max_score'] = max(track['max_score'], best_match['score'])
+
+                        updated_tracks.append(track)
+
+                        # remove from best matching detection from detections
+                        del dets[dets.index(best_match)]
+
+                # if track was not updated
+                if len(updated_tracks) == 0 or track is not updated_tracks[-1]:
+                    # finish track when the conditions are met
+                    if track['max_score'] >= sigma_h and len(track['bboxes']) >= t_min:
+                        tracks_finished.append(track)
+
+            # create new tracks
+            new_tracks = [{'bboxes': [det['bbox']], 'max_score': det['score'], 'start_frame': frame_num,
+                           'color': color_for_boundingbox[(len(self.tracks_active) + random.randint(0, 51)) % 51]}
+                          for i, det in enumerate(dets)]
+            self.tracks_active = updated_tracks + new_tracks
+
+            self.retval, current_frame = self.vc.read()
+            labeled_frame = show_tracking_results(current_frame, self.tracks_active)
+            rgb_frame = convert_cvimage_to_qimage(labeled_frame)
+            self.mot_signal.emit(rgb_frame)
+        self.vc.release()
+
+class MCMOT(QtCore.QThread):
+    '''A class for multi object tracking thread. '''
+    # video path and detection text path.
+    mcmot_det_dir1 = None
+    mcmot_video_dir1 = None
+    vc1 = None
+    mcmot_det_dir2 = None
+    mcmot_video_dir2 = None
+    vc2 = None
+
+    mcmot_signal1 = QtCore.pyqtSignal(QtGui.QImage)
+    mcmot_signal2 = QtCore.pyqtSignal(QtGui.QImage)
+
+    def __init__(self, parent=None):
+        super(MCMOT, self).__init__(parent)
+
+    def run(self):
+        self.vc1 = cv2.VideoCapture(self.mcmot_video_dir1)
+        self.vc2 = cv2.VideoCapture(self.mcmot_video_dir2)
+
+        # load bounding boxes.
+        dets1 = io.loadmat(self.mcmot_det_dir1)['demoData1']
+        dets2 = io.loadmat(self.mcmot_det_dir2)['demoData2']
+
+        # set the color of the object randomly.
+        color_for_boundingbox = [(13 * i % 255, (255 - 5 * i) % 255, (240 + 10 * i) % 255) for i in range(0, 51)]
+
+        # run algorithm.
+        f_num = 0
+        while(True):
+            retval, current_frame1 = self.vc1.read()
+            if retval == False:
+                break
+            retval, current_frame2 = self.vc2.read()
+            if retval == False:
+                break
+            f_num = f_num + 1
+            f_num1 = f_num + 76713
+            dets1_f = dets1[dets1[:, 2] == f_num1, :]
+            for det in dets1_f:
+                cv2.rectangle(
+                    current_frame1, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_for_boundingbox[(det[1] * 5)%50], 2)
+            rgb_frame1 = convert_cvimage_to_qimage(current_frame1)
+            self.mcmot_signal1.emit(rgb_frame1)
+
+            f_num2 = f_num + 76713
+            dets2_f = dets2[dets2[:, 2] == f_num2, :]
+            for det in dets2_f:
+                cv2.rectangle(
+                    current_frame2, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_for_boundingbox[(det[1] * 5)%50], 2)
+            rgb_frame2 = convert_cvimage_to_qimage(current_frame2)
+            self.mcmot_signal2.emit(rgb_frame2)
+        self.vc1.release()
+        self.vc2.release()
+        with open('MCMOT_Results.txt', 'w') as rst_f:
+            for d in dets1:
+                if d[2] > 76713 and d[2] < 115069:
+                    rst_f.write(','.join([str(value) for value in d]) + '\n')
+            for d in dets2:
+                if d[2] > 76713 and d[2] < 115069:
+                    rst_f.write(','.join([str(value) for value in d]) + '\n')
+
+def convert_cvimage_to_qimage(cvimage):
+    '''Change the image format from mat to QImage.
+
+    Args:
+     cvimage: an image which is loaded by cv2.imread
+    Return:
+     q_image: an image can be shown on a qwidgets.
+    '''
+    bgr_image = cv2.resize(cvimage, (640, 480))
+    rgb_frame = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
+    q_image = QtGui.QImage(rgb_frame.data, rgb_frame.shape[1], rgb_frame.shape[0],
+                           QtGui.QImage.Format_RGB888)
+    return q_image
+
+''' def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         #窗口大小
         MainWindow.resize(1280, 720)
@@ -349,198 +567,4 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.choose_video1.setText(_translate("MainWindow", "选择视频文件1"))
         self.choose_video2.setText(_translate("MainWindow", "选择视频文件2"))
         self.begin_2.setText(_translate("MainWindow", "运行并导出结果"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "多摄像头多目标跟踪"))
-
-    def Open_file_txt(self):
-        '''set the multi-object tracking detection directory. '''
-        self.mot_thread.mot_det_dir, _ = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                                               "选取文本文件",
-                                                                               "C:/",
-                                                                               "All Files (*);;Text Files (*.txt)")
-
-    # 开视频文件槽函数
-    def Open_file_video(self):
-        '''set the multi-object tracking video directory.'''
-        self.mot_thread.mot_video_dir, _ = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                                                 "选取视频文件",
-                                                                                 "C:/",
-                                                                                 "All Files (*);;Video Files (*.rmvb,*.avi)")
-
-    #梁总开文本和视频文件1和2
-    def Open_file_mat1(self):
-        self.mcmot_thread.mcmot_det_dir1, _ = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                                                    "选取文本文件",
-                                                                                    "C:/",
-                                                                                    "All Files (*);;Text Files (*.mat)")
-    def Open_file_mat2(self):
-        self.mcmot_thread.mcmot_det_dir2, _ = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                                                    "选取文本文件",
-                                                                                    "C:/",
-                                                                                    "All Files (*);;Text Files (*.mat)")
-    def Open_file_video1(self):
-        self.mcmot_thread.mcmot_video_dir1, _ = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                                                      "选取文本文件",
-                                                                                      "C:/",
-                                                                                      "All Files (*);;Text Files (*.mp4)")
-    def Open_file_video2(self):
-        self.mcmot_thread.mcmot_video_dir2, _ = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                                                      "选取文本文件",
-                                                                                      "C:/",
-                                                                                      "All Files (*);;Text Files (*.mp4)")
-
-
-
-    def update_frame(self, rgb_frame):
-        self.label_image_1.clear()
-        self.label_image_1.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
-    def update_mcmot_frame1(self, rgb_frame):
-        self.label_2_1.clear()
-        self.label_2_1.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
-    def update_mcmot_frame2(self, rgb_frame):
-        self.label_2_2.clear()
-        self.label_2_2.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
-    def End(self):
-        return
-class MOT(QtCore.QThread):
-    '''A class for multi object tracking thread. '''
-    # video path and detection text path.
-    mot_det_dir = None
-    mot_video_dir = None
-    vc = None
-    tracks_active = []
-
-    mot_signal = QtCore.pyqtSignal(QtGui.QImage)
-
-    def __init__(self, parent=None):
-        super(MOT, self).__init__(parent)
-
-    def run(self):
-        self.vc = cv2.VideoCapture(self.mot_video_dir)
-
-        sigma_l = 0.4
-        sigma_h = 0.5
-        sigma_iou = 0.2
-        t_min = 2
-
-        # load bounding boxes.
-        detections = load_mot(self.mot_det_dir)
-
-        tracks_finished = []
-
-        # set the color of the object randomly.
-        color_for_boundingbox = [(13 * i % 255, (255 - 5 * i) % 255, (240 + 10 * i) % 255) for i in range(0, 51)]
-
-        # run algorithm.
-        for frame_num, detections_frame in enumerate(detections, start=1):
-            # apply low threshold to detections
-
-            dets = [det for det in detections_frame if det['score'] >= sigma_l]
-
-            updated_tracks = []
-
-            for track in self.tracks_active:
-                if len(dets) > 0:
-                    # get det with highest iou
-                    best_match = max(dets, key=lambda x: iou(track['bboxes'][-1], x['bbox']))
-                    if iou(track['bboxes'][-1], best_match['bbox']) >= sigma_iou:
-                        track['bboxes'].append(best_match['bbox'])
-                        track['max_score'] = max(track['max_score'], best_match['score'])
-
-                        updated_tracks.append(track)
-
-                        # remove from best matching detection from detections
-                        del dets[dets.index(best_match)]
-
-                # if track was not updated
-                if len(updated_tracks) == 0 or track is not updated_tracks[-1]:
-                    # finish track when the conditions are met
-                    if track['max_score'] >= sigma_h and len(track['bboxes']) >= t_min:
-                        tracks_finished.append(track)
-
-            # create new tracks
-            new_tracks = [{'bboxes': [det['bbox']], 'max_score': det['score'], 'start_frame': frame_num,
-                           'color': color_for_boundingbox[(len(self.tracks_active) + random.randint(0, 51)) % 51]}
-                          for i, det in enumerate(dets)]
-            self.tracks_active = updated_tracks + new_tracks
-
-            self.retval, current_frame = self.vc.read()
-            labeled_frame = show_tracking_results(current_frame, self.tracks_active)
-            rgb_frame = convert_cvimage_to_qimage(labeled_frame)
-            self.mot_signal.emit(rgb_frame)
-        self.vc.release()
-
-class MCMOT(QtCore.QThread):
-    '''A class for multi object tracking thread. '''
-    # video path and detection text path.
-    mcmot_det_dir1 = None
-    mcmot_video_dir1 = None
-    vc1 = None
-    mcmot_det_dir2 = None
-    mcmot_video_dir2 = None
-    vc2 = None
-
-    mcmot_signal1 = QtCore.pyqtSignal(QtGui.QImage)
-    mcmot_signal2 = QtCore.pyqtSignal(QtGui.QImage)
-
-    def __init__(self, parent=None):
-        super(MCMOT, self).__init__(parent)
-
-    def run(self):
-        self.vc1 = cv2.VideoCapture(self.mcmot_video_dir1)
-        self.vc2 = cv2.VideoCapture(self.mcmot_video_dir2)
-
-        # load bounding boxes.
-        dets1 = io.loadmat(self.mcmot_det_dir1)['demoData1']
-        dets2 = io.loadmat(self.mcmot_det_dir2)['demoData2']
-
-        # set the color of the object randomly.
-        color_for_boundingbox = [(13 * i % 255, (255 - 5 * i) % 255, (240 + 10 * i) % 255) for i in range(0, 51)]
-
-        # run algorithm.
-        f_num = 0
-        while(True):
-            retval, current_frame1 = self.vc1.read()
-            if retval == False:
-                break
-            retval, current_frame2 = self.vc2.read()
-            if retval == False:
-                break
-            f_num = f_num + 1
-            f_num1 = f_num + 76713
-            dets1_f = dets1[dets1[:, 2] == f_num1, :]
-            for det in dets1_f:
-                cv2.rectangle(
-                    current_frame1, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_for_boundingbox[(det[1] * 5)%50], 2)
-            rgb_frame1 = convert_cvimage_to_qimage(current_frame1)
-            self.mcmot_signal1.emit(rgb_frame1)
-
-            f_num2 = f_num + 76713
-            dets2_f = dets2[dets2[:, 2] == f_num2, :]
-            for det in dets2_f:
-                cv2.rectangle(
-                    current_frame2, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_for_boundingbox[(det[1] * 5)%50], 2)
-            rgb_frame2 = convert_cvimage_to_qimage(current_frame2)
-            self.mcmot_signal2.emit(rgb_frame2)
-        self.vc1.release()
-        self.vc2.release()
-        with open('MCMOT_Results.txt', 'w') as rst_f:
-            for d in dets1:
-                if d[2] > 76713 and d[2] < 115069:
-                    rst_f.write(','.join([str(value) for value in d]) + '\n')
-            for d in dets2:
-                if d[2] > 76713 and d[2] < 115069:
-                    rst_f.write(','.join([str(value) for value in d]) + '\n')
-
-def convert_cvimage_to_qimage(cvimage):
-    '''Change the image format from mat to QImage.
-
-    Args:
-     cvimage: an image which is loaded by cv2.imread
-    Return:
-     q_image: an image can be shown on a qwidgets.
-    '''
-    bgr_image = cv2.resize(cvimage, (640, 480))
-    rgb_frame = cv2.cvtColor(bgr_image, cv2.COLOR_BGR2RGB)
-    q_image = QtGui.QImage(rgb_frame.data, rgb_frame.shape[1], rgb_frame.shape[0],
-                           QtGui.QImage.Format_RGB888)
-    return q_image
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "多摄像头多目标跟踪"))'''
