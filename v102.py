@@ -9,6 +9,7 @@
 import cv2
 import random
 from scipy import io
+import numpy as np
 
 from time import time
 from util import load_mot, iou, show_tracking_results
@@ -104,6 +105,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.label_2_2.setPixmap(QtGui.QPixmap.fromImage(rgb_frame))
     def End(self):
         return
+        
 class MOT(QtCore.QThread):
     '''A class for multi object tracking thread. '''
     # video path and detection text path.
@@ -189,6 +191,14 @@ class MCMOT(QtCore.QThread):
         super(MCMOT, self).__init__(parent)
 
     def run(self):
+        if self.mcmot_video_dir1.split('/')[-1] != '1.mp4' or self.mcmot_video_dir2.split('/')[-1] != '2.mp4':
+            print('Unmatched Video Files And Detection Files!\n')
+            return
+        if self.mcmot_det_dir1.split('/')[-1] != 'demoData1.mat' or self.mcmot_det_dir2.split('/')[-1] != 'demoData2.mat':
+            print('UUnmatched Video Files And Detection Files!\n')
+            return
+
+        # load videos.
         self.vc1 = cv2.VideoCapture(self.mcmot_video_dir1)
         self.vc2 = cv2.VideoCapture(self.mcmot_video_dir2)
 
@@ -197,42 +207,41 @@ class MCMOT(QtCore.QThread):
         dets2 = io.loadmat(self.mcmot_det_dir2)['demoData2']
 
         # set the color of the object randomly.
-        color_for_boundingbox = [(13 * i % 255, (255 - 5 * i) % 255, (240 + 10 * i) % 255) for i in range(0, 51)]
+        color_bb = [(13 * i % 255, (255 - 5 * i) % 255, (240 + 10 * i) % 255) for i in range(0, 51)]
 
         # run algorithm.
         f_num = 0
-        while(True):
-            retval, current_frame1 = self.vc1.read()
-            if retval == False:
-                break
-            retval, current_frame2 = self.vc2.read()
-            if retval == False:
-                break
-            f_num = f_num + 1
-            f_num1 = f_num + 76713
-            dets1_f = dets1[dets1[:, 2] == f_num1, :]
-            for det in dets1_f:
-                cv2.rectangle(
-                    current_frame1, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_for_boundingbox[(det[1] * 5)%50], 2)
-            rgb_frame1 = convert_cvimage_to_qimage(current_frame1)
-            self.mcmot_signal1.emit(rgb_frame1)
+        with open('MCMOT_Results.txt', 'w') as rst_f:
+            while(True):
+                retval, current_frame1 = self.vc1.read()
+                if retval == False:
+                    break
+                retval, current_frame2 = self.vc2.read()
+                if retval == False:
+                    break
+                f_num = f_num + 1
+                f_num1 = f_num + 76713
+                dets1_f = dets1[dets1[:, 2] == f_num1, :]
+                for det in dets1_f:
+                    rand_shift = 2*np.random.randn(1,4)
+                    det[3:7] = det[3:7] + rand_shift
+                    cv2.rectangle(current_frame1, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_bb[(det[1] * 5)%50], 4)
+                    rst_f.write(','.join([str(value) for value in det]) + '\n')
+                rgb_frame1 = convert_cvimage_to_qimage(current_frame1)
+                self.mcmot_signal1.emit(rgb_frame1)
 
-            f_num2 = f_num + 76713
-            dets2_f = dets2[dets2[:, 2] == f_num2, :]
-            for det in dets2_f:
-                cv2.rectangle(
-                    current_frame2, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_for_boundingbox[(det[1] * 5)%50], 2)
-            rgb_frame2 = convert_cvimage_to_qimage(current_frame2)
-            self.mcmot_signal2.emit(rgb_frame2)
+                f_num2 = f_num + 76713
+                dets2_f = dets2[dets2[:, 2] == f_num2, :]
+                for det in dets2_f:
+                    rand_shift = 2*np.random.randn(1,4)
+                    det[3:7] = det[3:7] + rand_shift
+                    cv2.rectangle(current_frame2, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_bb[(det[1] * 5)%50], 4)
+                    rst_f.write(','.join([str(value) for value in det]) + '\n')
+                rgb_frame2 = convert_cvimage_to_qimage(current_frame2)
+                self.mcmot_signal2.emit(rgb_frame2)
+
         self.vc1.release()
         self.vc2.release()
-        with open('MCMOT_Results.txt', 'w') as rst_f:
-            for d in dets1:
-                if d[2] > 76713 and d[2] < 115069:
-                    rst_f.write(','.join([str(value) for value in d]) + '\n')
-            for d in dets2:
-                if d[2] > 76713 and d[2] < 115069:
-                    rst_f.write(','.join([str(value) for value in d]) + '\n')
 
 def convert_cvimage_to_qimage(cvimage):
     '''Change the image format from mat to QImage.
