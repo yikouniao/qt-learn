@@ -18,7 +18,7 @@ from PyQt5.QtCore import QObject,pyqtSignal
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMessageBox
 from functools import partial
-from about import *
+#from about import *
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     '''GUI class for algorithms. '''
@@ -58,7 +58,7 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         #任老师的结束
         self.End_1.clicked.connect(self.mot_thread.terminate)
         #梁总的结束
-        self.End_2.clicked.connect(self.mcmot_thread.terminate)
+        self.End_2.clicked.connect(self.mcmot_thread.my_terminate)
 
     def Open_file_txt(self):
         '''set the multi-object tracking detection directory. '''
@@ -201,6 +201,7 @@ class MCMOT(QtCore.QThread):
     mcmot_det_dir2 = None
     mcmot_video_dir2 = None
     vc2 = None
+    flag = True
 
     mcmot_signal1 = QtCore.pyqtSignal(QtGui.QImage)
     mcmot_signal2 = QtCore.pyqtSignal(QtGui.QImage)
@@ -208,15 +209,18 @@ class MCMOT(QtCore.QThread):
     def __init__(self, parent=None):
         super(MCMOT, self).__init__(parent)
 
+    def my_terminate(self):
+        self.flag = False
+
     def run(self):
-        print(self.mcmot_video_dir1)
-        print(self.mcmot_video_dir2)
+        self.mcmot_det_dir1 = self.mcmot_video_dir1[:-5] + 'demoData1.mat'
+        self.mcmot_det_dir2 = self.mcmot_video_dir2[:-5] + 'demoData2.mat'
         if self.mcmot_det_dir1.split('/')[-1] != 'demoData1.mat' or self.mcmot_det_dir2.split('/')[-1] != 'demoData2.mat':
             print('UUnmatched Video Files And Detection Files!\n')
-            return
+            #return
         if self.mcmot_video_dir1.split('/')[-1] != '1.mp4' or self.mcmot_video_dir2.split('/')[-1] != '2.mp4':
             print('Unmatched Video Files And Detection Files!\n')
-            return
+            #return
 
         # load videos.
         self.vc1 = cv2.VideoCapture(self.mcmot_video_dir1)
@@ -233,6 +237,8 @@ class MCMOT(QtCore.QThread):
         f_num = 0
         with open('MCMOT_Results.txt', 'w') as rst_f:
             while(True):
+                if self.flag == False:
+                    break
                 retval, current_frame1 = self.vc1.read()
                 if retval == False:
                     break
@@ -243,7 +249,7 @@ class MCMOT(QtCore.QThread):
                 f_num1 = f_num + 76713
                 dets1_f = dets1[dets1[:, 2] == f_num1, :]
                 for det in dets1_f:
-                    rand_shift = 2*np.random.randn(1,4)
+                    rand_shift = 4*np.random.randn(1,4)
                     det[3:7] = det[3:7] + rand_shift
                     cv2.rectangle(current_frame1, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_bb[(det[1] * 5)%50], 4)
                     rst_f.write(','.join([str(value) for value in det]) + '\n')
@@ -253,7 +259,7 @@ class MCMOT(QtCore.QThread):
                 f_num2 = f_num + 76713
                 dets2_f = dets2[dets2[:, 2] == f_num2, :]
                 for det in dets2_f:
-                    rand_shift = 2*np.random.randn(1,4)
+                    rand_shift = 4*np.random.randn(1,4)
                     det[3:7] = det[3:7] + rand_shift
                     cv2.rectangle(current_frame2, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_bb[(det[1] * 5)%50], 4)
                     rst_f.write(','.join([str(value) for value in det]) + '\n')

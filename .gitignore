@@ -1,2 +1,6 @@
 __pycache__/*
 .idea/*
+*.txt
+*.mat
+*.mp4
+*.mts
