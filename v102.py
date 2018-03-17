@@ -18,8 +18,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QObject,pyqtSignal
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import QMessageBox
+from PyQt5.Qt import *
+
 from functools import partial
-#from about import *
+
 
 class Ui_MainWindow(QtWidgets.QMainWindow):
     '''GUI class for algorithms. '''
@@ -27,16 +29,22 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
     mot_thread = None
     mcmot_thread = None
 
+
+
+
     # 初始化
     def __init__(self):
         super(Ui_MainWindow, self).__init__()  # 继承自Widgets的构造方法
         self.mot_thread = MOT()
         self.mcmot_thread = MCMOT()
-        loadUi('v104.ui',self,'resource.qrc')
+
+        loadUi('v105.ui',self,'resource.qrc')
         #self.setFixedSize(self.sizeHint())
+
+
         image = QtGui.QImage()
         image.load('./res/icon.png')
-
+        self.tabWidget.currentChanged.connect(self.rerender)
 
         self.label_image_1.setImage(image)
 
@@ -97,6 +105,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                                                                       "选取文本文件",
                                                                                       "C:/",
                                                                                       "Text Files (*.mp4)")
+    def rerender(self):
+        return
+
+
 
 
 
@@ -191,6 +203,7 @@ class MOT(QtCore.QThread):
             labeled_frame = show_tracking_results(current_frame, self.tracks_active)
             rgb_frame = convert_cvimage_to_qimage(labeled_frame)
             self.mot_signal.emit(rgb_frame)
+
 
             # finish all remaining active tracks
         tracks_finished += [track for track in self.tracks_active
