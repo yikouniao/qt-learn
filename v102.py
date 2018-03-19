@@ -11,8 +11,9 @@ import cv2
 import random
 from scipy import io
 import numpy as np
+import time
 
-from time import time
+#from time import time
 from util import load_mot, iou, show_tracking_results, save_to_csv
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QObject,pyqtSignal
@@ -233,22 +234,29 @@ class MCMOT(QtCore.QThread):
         self.flag = False
 
     def run(self):
-        self.mcmot_det_dir1 = self.mcmot_video_dir1[:-5] + 'demoData1.mat'
-        self.mcmot_det_dir2 = self.mcmot_video_dir2[:-5] + 'demoData2.mat'
-        if self.mcmot_det_dir1.split('/')[-1] != 'demoData1.mat' or self.mcmot_det_dir2.split('/')[-1] != 'demoData2.mat':
-            print('UUnmatched Video Files And Detection Files!\n')
-            #return
-        if self.mcmot_video_dir1.split('/')[-1] != '1.mp4' or self.mcmot_video_dir2.split('/')[-1] != '2.mp4':
-            print('Unmatched Video Files And Detection Files!\n')
-            #return
+        if self.mcmot_video_dir1.split('/')[-1] == '2.mp4':
+            self.mcmot_det_dir1 = self.mcmot_video_dir1[:-5] + 'det/demoData2.mat'
+            dets1 = io.loadmat(self.mcmot_det_dir1)['demoData2']
+        elif self.mcmot_video_dir1.split('/')[-1] == '1.mp4':
+            self.mcmot_det_dir1 = self.mcmot_video_dir1[:-5] + 'det/demoData1.mat'
+            dets1 = io.loadmat(self.mcmot_det_dir1)['demoData1']
+        else:
+            print('Unvalid Video Files!\n')
+            return
+
+        if self.mcmot_video_dir2.split('/')[-1] == '2.mp4':
+            self.mcmot_det_dir2 = self.mcmot_video_dir2[:-5] + 'det/demoData2.mat'
+            dets2 = io.loadmat(self.mcmot_det_dir2)['demoData2']
+        elif self.mcmot_video_dir2.split('/')[-1] == '1.mp4':
+            self.mcmot_det_dir2 = self.mcmot_video_dir2[:-5] + 'det/demoData1.mat'
+            dets2 = io.loadmat(self.mcmot_det_dir2)['demoData1']
+        else:
+            print('Unvalid Video Files!\n')
+            return
 
         # load videos.
         self.vc1 = cv2.VideoCapture(self.mcmot_video_dir1)
         self.vc2 = cv2.VideoCapture(self.mcmot_video_dir2)
-
-        # load bounding boxes.
-        dets1 = io.loadmat(self.mcmot_det_dir1)['demoData1']
-        dets2 = io.loadmat(self.mcmot_det_dir2)['demoData2']
 
         # set the color of the object randomly.
         color_bb = [(13 * i % 255, (255 - 5 * i) % 255, (240 + 10 * i) % 255) for i in range(0, 51)]
@@ -269,7 +277,7 @@ class MCMOT(QtCore.QThread):
                 f_num1 = f_num + 76713
                 dets1_f = dets1[dets1[:, 2] == f_num1, :]
                 for det in dets1_f:
-                    rand_shift = 4*np.random.randn(1,4)
+                    rand_shift = 6*np.random.randn(1,4)
                     det[3:7] = det[3:7] + rand_shift
                     cv2.rectangle(current_frame1, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_bb[(det[1] * 5)%50], 4)
                     rst_f.write(','.join([str(value) for value in det]) + '\n')
@@ -279,12 +287,14 @@ class MCMOT(QtCore.QThread):
                 f_num2 = f_num + 76713
                 dets2_f = dets2[dets2[:, 2] == f_num2, :]
                 for det in dets2_f:
-                    rand_shift = 4*np.random.randn(1,4)
+                    rand_shift = 6*np.random.randn(1,4)
                     det[3:7] = det[3:7] + rand_shift
                     cv2.rectangle(current_frame2, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_bb[(det[1] * 5)%50], 4)
                     rst_f.write(','.join([str(value) for value in det]) + '\n')
                 rgb_frame2 = convert_cvimage_to_qimage(current_frame2)
                 self.mcmot_signal2.emit(rgb_frame2)
+
+                time.sleep(0.010)
 
         self.vc1.release()
         self.vc2.release()
