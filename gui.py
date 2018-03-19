@@ -39,18 +39,10 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.mot_thread = MOT()
         self.mcmot_thread = MCMOT()
 
-        loadUi('v105.ui',self,'resource.qrc')
-        #self.setFixedSize(self.sizeHint())
+        loadUi('gui.ui',self,'resource.qrc')
 
-
-        image = QtGui.QImage()
-        image.load('./res/icon.png')
         self.tabWidget.currentChanged.connect(self.rerender)
 
-        self.label_image_1.setImage(image)
-
-        #icon = QtGui.QIcon()
-       #icon.addPixmap(QtGui.QPixmap("./res/icon.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         # 这个是主窗口的图标
         self.setWindowIcon(QtGui.QIcon("./res/main.ico"))
 
@@ -107,7 +99,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
                                                                                       "C:/",
                                                                                       "Text Files (*.mp4)")
     def rerender(self):
-        return
+        image = QtGui.QImage(self.label_image_1.width(),self.label_image_1.height(),QtGui.QImage.Format_RGB30)
+        
+        self.label_image_1.setImage(image)
+        self.label_image_2.setImage(image)
+        self.label_image_3.setImage(image)
+
 
 
 

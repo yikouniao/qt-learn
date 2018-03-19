@@ -3,11 +3,14 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtOpenGL import *
+
+
 class ShrinkableQlabel(QGraphicsView):
 
     mScene = QGraphicsScene()
     mPixmapItem = QGraphicsPixmapItem()
     mSource = QImage()
+    mutex = QMutex()
     mHighQuality = 1
 
     def __init__(self, parent):
@@ -46,10 +49,12 @@ class ShrinkableQlabel(QGraphicsView):
         self.fitInView(0,0,self.mScene.width(),self.mScene.height(),Qt.KeepAspectRatio)
 
     def displayImage(self):
+        self.mutex.lock()
         pixmap = QPixmap.fromImage(self.mSource)
         self.mPixmapItem.setTransformationMode(Qt.SmoothTransformation if self.mHighQuality else Qt.FastTransformation)
         self.mPixmapItem.setPixmap(pixmap)
         self.mScene.setSceneRect(self.mPixmapItem.boundingRect())
+        self.mutex.unlock()
 
     def getRenderSize(self):
         s = QSizeF(self.mScene.width(),self.mScene.height())

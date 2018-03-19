@@ -1,0 +1,184 @@
+[33mcommit b91692d3b32499bc97344a2410dcbe2a25125079[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Merge: aa72d00 6c60a3e
+Author: x632701882 <847836922@qq.com>
+Date:   Mon Mar 19 11:17:56 2018 +0800
+
+    Merge pull request #9 from yikouniao/master
+    
+    各种改bug
+
+[33mcommit 6c60a3efd908eab4d0bd9836b4c9f4b9958ba45e[m
+Author: C&T <chinoandtippi@gmail.com>
+Date:   Mon Mar 19 11:16:43 2018 +0800
+
+    各种改bug
+
+[33mcommit aa72d00c146e29549a402f433ca26a94e116e166[m
+Author: x632701882 <847836922@qq.com>
+Date:   Sat Mar 17 16:37:11 2018 +0800
+
+    删除了文本选择按钮
+
+[33mcommit eb825bc6f275b59cfcff07cb675c22e96a72699e[m
+Merge: c0e3bd9 72e5483
+Author: x632701882 <847836922@qq.com>
+Date:   Sat Mar 17 10:39:22 2018 +0800
+
+    Merge pull request #8 from yikouniao/master
+    
+    更新停止函数和其他问题
+
+[33mcommit c0e3bd9f4677e93064aae85278b17724ae8b9963[m
+Merge: 4bd5a9e afacbc3
+Author: x632701882 <847836922@qq.com>
+Date:   Sat Mar 17 10:39:07 2018 +0800
+
+    Merge pull request #7 from qqrsqqq/fix_mot_bugs
+    
+    Fix some mot bug
+
+[33mcommit 72e548311a23e497a9339cf231f87e2cc6a70321[m
+Author: C&T <chinoandtippi@gmail.com>
+Date:   Fri Mar 16 20:58:29 2018 +0800
+
+    更新停止函数和其他问题
+
+[33mcommit afacbc387aafc9c3ea3b89d82f469e6e176644c9[m
+Author: qqrsqqq <870867109@qq.com>
+Date:   Fri Mar 16 10:55:01 2018 +0800
+
+    Fix some mot bug
+    
+    - add save result
+    - change load file function's input file type to the fixed one.
+
+[33mcommit 4bd5a9ebc3e8bc2824df2ec3ea5d6c453875d25f[m
+Author: x632701882 <847836922@qq.com>
+Date:   Thu Mar 15 23:45:43 2018 +0800
+
+    some changes
+
+[33mcommit 3e376da77110e1632fafc65c72ae285873113f96[m
+Merge: 77608de 2e557a6
+Author: x632701882 <847836922@qq.com>
+Date:   Thu Mar 15 21:59:54 2018 +0800
+
+    Merge pull request #6 from yikouniao/master
+    
+    增加停止功能
+
+[33mcommit 2e557a6d235dda6c0c4480e853a41368fad30138[m
+Author: C&T <chinoandtippi@gmail.com>
+Date:   Thu Mar 15 21:37:50 2018 +0800
+
+    更新帧
+
+[33mcommit f86fa003d8ae3186b90afc3ebda62da3bfc50c3b[m
+Author: C&T <chinoandtippi@gmail.com>
+Date:   Thu Mar 15 20:59:06 2018 +0800
+
+    增加停止功能
+
+[33mcommit 77608de3028b1bfa3214c8b115c81772133b88ef[m
+Author: Binping Liu <xx@xx>
+Date:   Thu Mar 15 20:34:04 2018 +0800
+
+    wqojbk
+
+[33mcommit bf126db7b1773fb41e3705df831704edba049395[m
+Merge: fbb6212 9f69775
+Author: x632701882 <847836922@qq.com>
+Date:   Thu Mar 15 14:55:32 2018 +0800
+
+    Merge pull request #5 from yikouniao/master
+    
+    修改多相机算法
+
+[33mcommit 9f697751eb6b5e9de9efa4e023147ada4aabe7f1[m
+Author: C&T <chinoandtippi@gmail.com>
+Date:   Thu Mar 15 14:04:53 2018 +0800
+
+    修改多相机想法
+
+[33mcommit fbb6212959a30a894e8fe77a6a1dfe9f2bc03f98[m
+Author: x632701882 <847836922@qq.com>
+Date:   Thu Mar 15 13:04:23 2018 +0800
+
+    v104banben
+
+[33mcommit ac3b80c902f868899b42708ace9ec02a963a05f3[m
+Merge: de61b80 3add3a3
+Author: x632701882 <847836922@qq.com>
+Date:   Thu Mar 15 09:46:36 2018 +0800
+
+    Merge pull request #4 from yikouniao/master
+    
+    修复结束时奔溃的bug，添加导出功能
+
+[33mcommit 3add3a349c90920711e3f88b9632a91bb8dad120[m
+Author: C&T <chinoandtippi@gmail.com>
+Date:   Wed Mar 14 21:31:57 2018 +0800
+
+    修复结束时奔溃的bug，添加导出功能
+
+[33mcommit de61b80a9c9dfb81ddff59cd4da1dd0c8bf5a1ab[m
+Author: x632701882 <847836922@qq.com>
+Date:   Wed Mar 14 17:22:00 2018 +0800
+
+    修改界面v103版本
+
+[33mcommit 51ec9671a02d2fa7d7babb7c15419686a121b812[m
+Merge: 7c1dbcb a4186b7
+Author: x632701882 <847836922@qq.com>
+Date:   Tue Mar 13 22:47:49 2018 +0800
+
+    Merge pull request #3 from yikouniao/master
+    
+    Add MCMOT
+
+[33mcommit a4186b724738da91eadd5a76b8dd0a80608b79cb[m
+Author: C&T <chinoandtippi@gmail.com>
+Date:   Tue Mar 13 21:13:01 2018 +0800
+
+    Add MCMOT
+
+[33mcommit 7c1dbcb04025fcad19a1614e8afa8e7cd2c1073b[m[33m ([m[1;31morigin/v102[m[33m)[m
+Author: x632701882 <847836922@qq.com>
+Date:   Tue Mar 13 17:55:01 2018 +0800
+
+    修改了界面
+
+[33mcommit 01a455b9c5e4a8d1557bd304e04a4a3f245a5970[m
+Merge: 9fc0fc0 80ff622
+Author: x632701882 <847836922@qq.com>
+Date:   Mon Mar 12 17:48:31 2018 +0800
+
+    Merge pull request #1 from qqrsqqq/multi-object-tracking
+    
+    Add multi object tracking algorithm
+
+[33mcommit 80ff6225780e783deddc5054bcd72ae641b1c2f7[m
+Author: qqrsqqq <870867109@qq.com>
+Date:   Mon Mar 12 16:57:23 2018 +0800
+
+    Add multi object tracking algorithm
+
+[33mcommit 9fc0fc0b14a2882d9d5c9f5094881fffc9d1bfa2[m[33m ([m[1;31morigin/gui[m[33m)[m
+Author: x632701882 <847836922@qq.com>
+Date:   Sun Mar 11 18:31:12 2018 +0800
+
+    改了下界面，但是校徽显示不出来，资源文件还是不知道怎么弄
+
+[33mcommit 0f227acf5162ae51583f719ee94ddd91e3bb2aac[m
+Author: x632701882 <847836922@qq.com>
+Date:   Fri Mar 9 13:43:50 2018 +0800
+
+    first
+    
+    first qt program
+
+[33mcommit f229363a95b9a0198a7cd873806804901fb10ccd[m
+Author: x632701882 <847836922@qq.com>
+Date:   Fri Mar 9 13:30:16 2018 +0800
+
+    Initial commit
