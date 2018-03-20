@@ -274,6 +274,8 @@ class MCMOT(QtCore.QThread):
                 f_num1 = f_num + 76713
                 dets1_f = dets1[dets1[:, 2] == f_num1, :]
                 for det in dets1_f:
+                    if f_num <= 30:
+                        break
                     rand_shift = 6*np.random.randn(1,4)
                     det[3:7] = det[3:7] + rand_shift
                     cv2.rectangle(current_frame1, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_bb[(det[1] * 5)%50], 4)
@@ -284,6 +286,8 @@ class MCMOT(QtCore.QThread):
                 f_num2 = f_num + 76713
                 dets2_f = dets2[dets2[:, 2] == f_num2, :]
                 for det in dets2_f:
+                    if f_num <= 30:
+                        break
                     rand_shift = 6*np.random.randn(1,4)
                     det[3:7] = det[3:7] + rand_shift
                     cv2.rectangle(current_frame2, (det[3], det[4]), (det[3] + det[5], det[4] + det[6]), color_bb[(det[1] * 5)%50], 4)
